@@ -26,7 +26,17 @@ I deployed two VMs in Azure (one Windows 10, one Ubuntu) and made sure both were
 
 I filtered Wireshark for ICMP and pinged the Ubuntu VM's private IP from the Windows VM. Watched the request/reply pairs show up in the capture. Then pinged google.com to see external ICMP traffic alongside internal.
 
-I also set up a continuous ping from the Windows VM to Ubuntu, went into the Ubuntu VM's Network Security Group in Azure, and blocked inbound ICMP. The replies stopped immediately, visible in both Wireshark and the command line at the same time. Re-enabled the rule and traffic came back.
+![ICMP request and reply packets in Wireshark alongside PowerShell ping output](Step%203e%20-%20Ping%20ICMP.png)
+
+I also set up a continuous ping from the Windows VM to Ubuntu, went into the Ubuntu VM's Network Security Group in Azure, and blocked inbound ICMP. The replies stopped immediately, visible in both Wireshark and the command line at the same time.
+
+![Continuous ping running before NSG rule is applied](Step%204a%20-%20Network%20Security%20Group.png)
+
+![Wireshark showing only requests and PowerShell showing Request timed out after NSG blocks ICMP](Step%204e%20-%20Network%20Security%20Group.png)
+
+Re-enabled the rule and traffic came back.
+
+![Traffic resuming in Wireshark and PowerShell after re-enabling the NSG rule](Step%204g%20-%20Network%20Security%20Group.png)
 
 ---
 
@@ -34,11 +44,15 @@ I also set up a continuous ping from the Windows VM to Ubuntu, went into the Ubu
 
 I filtered for SSH and connected into the Ubuntu VM from PowerShell using its private IP. Every command I typed produced a burst of packets in Wireshark, but none of the content was readable. Just encrypted traffic confirming the session was active.
 
+![Wireshark showing SSH encrypted packets alongside an active Linux session in PowerShell](Step%205b%20-%20SSH.png)
+
 ---
 
 ### DHCP: IP Address Renewal
 
 I filtered for DHCP and ran `ipconfig /renew` from an elevated PowerShell prompt. Watched the discover/offer/request/acknowledge exchange show up in the capture in sequence.
+
+![Wireshark showing the full DHCP Release, Discover, Offer, Request, and ACK sequence](Step%206c-%20DHCP.png)
 
 ---
 
@@ -46,11 +60,15 @@ I filtered for DHCP and ran `ipconfig /renew` from an elevated PowerShell prompt
 
 I filtered for DNS and used `nslookup` to query google.com and disney.com. Watched the query go out and the response come back with IP addresses. Worth noting that the queries are plaintext, so even when the connection that follows is encrypted, the lookup is still visible in the capture.
 
+![Wireshark showing DNS query and response alongside nslookup output in PowerShell](Step%207a-%20DNS.png)
+
 ---
 
 ### RDP: Continuous Stream
 
 I filtered for RDP traffic on tcp.port 3389. Every other protocol generated traffic in response to something: a ping, a command, a query. RDP just ran constantly with no input from me, because it streams a live image of the remote desktop the entire time the session is open.
+
+![Wireshark showing constant RDP traffic stream on tcp.port 3389](Step%208a%20-%20RDP.png)
 
 ---
 
